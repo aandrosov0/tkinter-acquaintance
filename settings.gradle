@@ -1,0 +1,2 @@
+rootProject.name = 'tkinter-acquaintance-multiproject'
+include 'toolchain', 'server'

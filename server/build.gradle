@@ -1,0 +1,20 @@
+plugins {
+    id 'application'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+application {
+    mainClass = 'com.github.aandrosov.tkinter.server.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':toolchain')
+
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+}
