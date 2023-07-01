@@ -11,11 +11,6 @@ import java.util.Map;
 
 public class Router implements HttpHandler {
 
-    public interface OnRequestMethodListener {
-
-        OnRouteListener[] getRoutes();
-    }
-
     private OnRequestMethodListener methodGetListener = () -> new OnRouteListener[]{};
 
     private OnRequestMethodListener methodPostListener = () -> new OnRouteListener[]{};

@@ -1,12 +1,17 @@
 package com.github.aandrosov.tkinter.server;
 
-import com.github.aandrosov.tkinter.server.route.*;
+import com.github.aandrosov.tkinter.server.route.api.*;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Server {
+
+    public final static Algorithm SECURITY_ALGORITHM = Algorithm.HMAC256("Bu2'!Hy&^RQrE7'");
+
+    public final static String JWT_AUTHORIZATION_SCHEME = "Bearer";
 
     private final Router router = new Router();
 
@@ -31,12 +36,16 @@ public class Server {
 
     private OnRouteListener[] getMethodGetListener() {
         return new OnRouteListener[]{
-                new UserGetRouteListener()
+                new UserGetRoute(),
+                new UserGetAmountRoute()
         };
     }
 
     private OnRouteListener[] getMethodPostListener() {
-        return new OnRouteListener[]{};
+        return new OnRouteListener[]{
+                new LoginRoute(),
+                new RegisterRoute()
+        };
     }
 
     private OnRouteListener[] getMethodPutListener() {
