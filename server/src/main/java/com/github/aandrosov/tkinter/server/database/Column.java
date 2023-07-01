@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface Column {
 
     String value();
+    boolean isPrimaryKey() default false;
 }
