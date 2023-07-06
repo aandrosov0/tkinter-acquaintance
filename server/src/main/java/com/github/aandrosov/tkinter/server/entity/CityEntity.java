@@ -9,10 +9,6 @@ public class CityEntity extends Entity {
     @Column("name")
     private String name;
 
-    public CityEntity() {
-
-    }
-
     public CityEntity(long id, String name) {
         setId(id);
         this.name = name;

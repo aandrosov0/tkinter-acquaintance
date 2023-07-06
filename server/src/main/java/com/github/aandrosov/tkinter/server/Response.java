@@ -20,18 +20,22 @@ public class Response {
         exchange.sendResponseHeaders(code, length);
     }
 
+    public void sendData(byte[] data, int code, String contentType) throws IOException {
+        exchange.getResponseHeaders().add("Content-Type", contentType);
+        exchange.sendResponseHeaders(code, data.length);
+        exchange.getResponseBody().write(data);
+    }
+
     public void sendJson(String json, int code) throws IOException {
-        sendData(json, code, "application/json; charset=utf-8");
+        sendData(json.getBytes(StandardCharsets.UTF_8), code, "application/json; charset=utf-8");
     }
 
     public void sendText(String text, int code) throws IOException {
-        sendData(text, code, "text/html; charset=utf-8");
+        sendData(text.getBytes(StandardCharsets.UTF_8), code, "text/html; charset=utf-8");
     }
 
-    public void sendData(String data, int code, String contentType) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", contentType);
-        exchange.sendResponseHeaders(code, data.length());
-        exchange.getResponseBody().write(data.getBytes(StandardCharsets.UTF_8));
+    public void sendData(byte[] data, int code) throws IOException {
+        sendData(data, code, "application/octet-stream");
     }
 
     public Headers getHeaders() {

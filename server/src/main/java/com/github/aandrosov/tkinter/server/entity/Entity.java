@@ -6,14 +6,48 @@ import com.github.aandrosov.tkinter.toolchain.Classes;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public abstract class Entity {
 
-    @Column(value = "id", isPrimaryKey = true)
+    @Column("id")
     private long id;
+
+    public static String getTable(Class<?> entityClass) {
+        if(!entityClass.isAnnotationPresent(Table.class)) {
+            return null;
+        }
+
+        return entityClass.getAnnotation(Table.class).value();
+    }
+
+    public void init(ResultSet resultSet) throws SQLException, IllegalAccessException {
+        List<Field> columns = Classes.getAnnotatedFields(getClass(), Column.class);
+
+        for(Field field : columns) {
+            Column column = field.getDeclaredAnnotation(Column.class);
+            field.setAccessible(true);
+            Object fieldValue = resultSet.getObject(column.value());
+            field.set(this, fieldValue);
+        }
+    }
+
+    public Map<String, Object> getColumns() throws IllegalAccessException {
+        List<Field> fields = Classes.getAnnotatedFields(getClass(), Column.class);
+        Map<String, Object> columns = new HashMap<>();
+
+        for(Field field : fields) {
+            field.setAccessible(true);
+            Column column = field.getAnnotation(Column.class);
+            columns.put(column.value(), field.get(this));
+        }
+
+        return columns;
+    }
 
     public long getId() {
         return id;
@@ -21,47 +55,5 @@ public abstract class Entity {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    protected void setColumnFieldValue(Field field, Object value) throws Exception {
-        field.set(this, value);
-    }
-
-    protected Object getColumnFieldValue(Field field) throws Exception {
-        return field.get(this);
-    }
-
-    public void setResultSetData(ResultSet resultSet) throws Exception {
-        List<Field> fields = Classes.getAnnotatedFields(getClass(), Column.class);
-        for(Field field : fields) {
-            field.setAccessible(true);
-            String columnName = field.getAnnotation(Column.class).value();
-            Object columnValue = resultSet.getObject(columnName);
-            setColumnFieldValue(field, columnValue);
-        }
-    }
-
-    public String getTableName() {
-        if(!getClass().isAnnotationPresent(Table.class)) {
-            return null;
-        }
-
-        return getClass().getAnnotation(Table.class).value();
-    }
-
-    public Map<String, Object> getColumnsAndValuesWithoutPrimaryKeys() throws Exception {
-        List<Field> fields = Classes.getAnnotatedFields(getClass(), Column.class);
-        Map<String, Object> values = new HashMap<>();
-
-        for(Field field : fields) {
-            field.setAccessible(true);
-            Column column = field.getAnnotation(Column.class);
-            if(!column.isPrimaryKey()) {
-                Object value = getColumnFieldValue(field);
-                values.put(column.value(), value);
-            }
-        }
-
-        return values;
     }
 }

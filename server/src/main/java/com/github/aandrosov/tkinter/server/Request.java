@@ -3,8 +3,8 @@ package com.github.aandrosov.tkinter.server;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.github.aandrosov.tkinter.server.route.api.LoginRoute;
 import com.github.aandrosov.tkinter.toolchain.Streams;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -55,8 +55,10 @@ public class Request {
         }
 
         JWTVerifier verifier = JWT.require(Server.SECURITY_ALGORITHM)
-                .withClaimPresence("id")
-                .acceptExpiresAt(LoginRoute.DEFAULT_EXPIRATION_IN_MINUTES * 60)
+                .withClaim("id", (claim, decodedJWT) -> {
+                    Claim idClaim = decodedJWT.getClaim("id");
+                    return idClaim != null && idClaim.asLong() != null;
+                })
                 .build();
 
         try {
@@ -84,6 +86,11 @@ public class Request {
     }
 
     public boolean isFormUrlEncodedContentType() {
-        return ("application/x-www-form-urlencoded").equals(exchange.getRequestHeaders().getFirst("Content-Type"));
+        return "application/x-www-form-urlencoded".equals(exchange.getRequestHeaders().getFirst("Content-Type"));
+    }
+
+    public boolean isImageContentType() {
+        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+        return "image/jpeg".equals(contentType) || "image/png".equals(contentType);
     }
 }

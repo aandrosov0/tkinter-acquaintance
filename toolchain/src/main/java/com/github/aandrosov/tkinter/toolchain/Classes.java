@@ -21,10 +21,10 @@ public class Classes {
         return fields;
     }
 
-    public static List<Field> getAnnotatedFields(Class<?> classType, Class<? extends Annotation> annotationType) {
+    public static List<Field> getAnnotatedFields(Class<?> classType, Class<? extends Annotation> annotationTypes) {
         return getAllFields(classType).stream()
-                .map(field -> field.isAnnotationPresent(annotationType) ? field : null)
-                .map(Objects::requireNonNull)
+                .map(field -> field.isAnnotationPresent(annotationTypes) ? field : null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

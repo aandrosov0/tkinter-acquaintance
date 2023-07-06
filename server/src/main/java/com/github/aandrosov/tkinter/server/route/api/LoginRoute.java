@@ -5,18 +5,26 @@ import com.github.aandrosov.tkinter.server.OnRouteListener;
 import com.github.aandrosov.tkinter.server.Request;
 import com.github.aandrosov.tkinter.server.Response;
 import com.github.aandrosov.tkinter.server.Server;
-import com.github.aandrosov.tkinter.server.entity.EntityFactory;
+import com.github.aandrosov.tkinter.server.entity.EntityService;
 import com.github.aandrosov.tkinter.server.entity.UserEntity;
 import com.github.aandrosov.tkinter.toolchain.Hash;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.Map;
 
 public class LoginRoute implements OnRouteListener {
 
     public static final long DEFAULT_EXPIRATION_IN_MINUTES = 30;
+
+
+    private final EntityService entityService;
+
+    public LoginRoute(EntityService entityService) {
+        this.entityService = entityService;
+    }
 
     @Override
     public void listen(Request request, Response response, Map<String, String> routeQuery) throws Exception {
@@ -34,9 +42,12 @@ public class LoginRoute implements OnRouteListener {
             return;
         }
 
-        UserEntity user = EntityFactory.getBy("phone", phone, UserEntity.class);
+        Map<String, Object> criteria = new HashMap<>();
+        criteria.put("phone", phone);
+
+        UserEntity user = (UserEntity) entityService.findOne(UserEntity.class, criteria);
         if(user == null) {
-            response.sendHeaders(422, -1);
+            response.sendHeaders(404, -1);
             return;
         }
 

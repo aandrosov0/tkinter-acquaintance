@@ -3,12 +3,19 @@ package com.github.aandrosov.tkinter.server.route.api;
 import com.github.aandrosov.tkinter.server.OnRouteListener;
 import com.github.aandrosov.tkinter.server.Request;
 import com.github.aandrosov.tkinter.server.Response;
-import com.github.aandrosov.tkinter.server.entity.EntityFactory;
+import com.github.aandrosov.tkinter.server.entity.Entity;
+import com.github.aandrosov.tkinter.server.entity.EntityService;
 import com.github.aandrosov.tkinter.server.entity.UserEntity;
 
 import java.util.Map;
 
 public class UserGetRoute implements OnRouteListener {
+
+    private final EntityService entityService;
+
+    public UserGetRoute(EntityService entityService) {
+        this.entityService = entityService;
+    }
 
     @Override
     public void listen(Request request, Response response, Map<String, String> routeQuery) throws Exception {
@@ -20,7 +27,7 @@ public class UserGetRoute implements OnRouteListener {
             return;
         }
 
-        UserEntity user = EntityFactory.getBy("id", id, UserEntity.class);
+        Entity user = entityService.findById(UserEntity.class, id);
 
         if(user == null) {
             response.sendHeaders(404, -1);

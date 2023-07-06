@@ -4,13 +4,19 @@ import com.github.aandrosov.tkinter.server.OnRouteListener;
 import com.github.aandrosov.tkinter.server.Request;
 import com.github.aandrosov.tkinter.server.Response;
 import com.github.aandrosov.tkinter.server.entity.CityEntity;
-import com.github.aandrosov.tkinter.server.entity.EntityFactory;
+import com.github.aandrosov.tkinter.server.entity.EntityService;
 import com.github.aandrosov.tkinter.server.entity.UserEntity;
 import com.github.aandrosov.tkinter.toolchain.Validator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterRoute implements OnRouteListener {
+    private final EntityService entityService;
+
+    public RegisterRoute(EntityService entityService) {
+        this.entityService = entityService;
+    }
 
     @Override
     public void listen(Request request, Response response, Map<String, String> ignored) throws Exception {
@@ -47,19 +53,22 @@ public class RegisterRoute implements OnRouteListener {
             return;
         }
 
-        if(EntityFactory.isExists("phone", phone, UserEntity.class)) {
+        Map<String, Object> comparedCriteria = new HashMap<>();
+        comparedCriteria.put("phone", phone);
+        if(entityService.isExists(UserEntity.class, comparedCriteria)) {
             response.sendHeaders(409, -1);
             return;
         }
 
-        CityEntity cityEntity = EntityFactory.getBy("id", cityId, CityEntity.class);
-        if(cityEntity == null) {
+        comparedCriteria.clear();
+        comparedCriteria.put("id", cityId);
+        if(!entityService.isExists(CityEntity.class, comparedCriteria)) {
             response.sendHeaders(422, -1);
             return;
         }
 
-        UserEntity userEntity = new UserEntity(name, about, phone, password, cityEntity);
-        long id = EntityFactory.insert(userEntity);
+        UserEntity userEntity = new UserEntity(name, about, phone, password, cityId);
+        long id = entityService.insert(userEntity);
         response.sendJson("{\"id\":" + id + "}", 200);
     }
 

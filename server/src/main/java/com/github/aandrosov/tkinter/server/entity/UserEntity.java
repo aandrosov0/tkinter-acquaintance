@@ -4,7 +4,6 @@ import com.github.aandrosov.tkinter.server.database.Column;
 import com.github.aandrosov.tkinter.server.database.Table;
 import com.github.aandrosov.tkinter.toolchain.Hash;
 
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 @Table("user")
@@ -23,23 +22,23 @@ public class UserEntity extends Entity {
     private String password;
 
     @Column("city_id")
-    private CityEntity cityEntity;
+    private long cityId;
 
     public UserEntity() {
 
     }
 
-    public UserEntity(int id, String name, String about, String phone, String password, CityEntity cityEntity) {
+    public UserEntity(int id, String name, String about, String phone, String password, long cityId) {
         setId(id);
         this.name = name;
         this.about = about;
         this.phone = phone;
-        this.password = password;
-        this.cityEntity = cityEntity;
+        this.cityId = cityId;
+        setPassword(password);
     }
 
-    public UserEntity(String name, String about, String phone, String password, CityEntity cityEntity) {
-        this(0, name, about, phone, password, cityEntity);
+    public UserEntity(String name, String about, String phone, String password, long cityId) {
+        this(0, name, about, phone, password, cityId);
     }
 
     public String getName() {
@@ -62,14 +61,6 @@ public class UserEntity extends Entity {
         return phone;
     }
 
-    public CityEntity getCity() {
-        return cityEntity;
-    }
-
-    public void setCity(CityEntity cityEntity) {
-        this.cityEntity = cityEntity;
-    }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -79,36 +70,29 @@ public class UserEntity extends Entity {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        byte[] hashedPassword = Hash.generateMD5(password.getBytes(StandardCharsets.UTF_8));
+        this.password = Hash.byteArrayToHex(hashedPassword);
+    }
+
+    public long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(long cityId) {
+        this.cityId = cityId;
     }
 
     @Override
     public String toString() {
-        return "{" +
-                "\"id\":" + getId() + "," +
-                "\"name\":\"" + name + "\"," +
-                "\"about\":\"" + about + "\"," +
-                "\"phone\":\"" + phone + "\"," +
-                "\"city_id\":" + cityEntity.getId() + "}";
-    }
-
-    @Override
-    protected void setColumnFieldValue(Field field, Object value) throws Exception {
-        if(field.getType().equals(CityEntity.class)) {
-            cityEntity = EntityFactory.getBy("id", value, CityEntity.class);
-        } else {
-            super.setColumnFieldValue(field, value);
+        try {
+            return "{" +
+                    "\"id\":" + getId() +
+                    ",\"name\":\"" + name + "\"," +
+                    "\"about\":\"" + about + "\"," +
+                    "\"phone\":\"" + phone + "\"," +
+                    "\"city_id\":" + cityId + "}";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    protected Object getColumnFieldValue(Field field) throws Exception {
-        if(field.getType().equals(CityEntity.class)) {
-            return cityEntity.getId();
-        } else if(field.getAnnotation(Column.class).value().equals("password")) {
-            return Hash.byteArrayToHex(Hash.generateMD5(((String)field.get(this)).getBytes(StandardCharsets.UTF_8)));
-        }
-
-        return super.getColumnFieldValue(field);
     }
 }

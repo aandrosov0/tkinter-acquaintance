@@ -3,13 +3,21 @@ package com.github.aandrosov.tkinter.server.route.api;
 import com.github.aandrosov.tkinter.server.OnRouteListener;
 import com.github.aandrosov.tkinter.server.Request;
 import com.github.aandrosov.tkinter.server.Response;
-import com.github.aandrosov.tkinter.server.entity.EntityFactory;
+import com.github.aandrosov.tkinter.server.entity.Entity;
+import com.github.aandrosov.tkinter.server.entity.EntityService;
 import com.github.aandrosov.tkinter.server.entity.UserEntity;
+import com.github.aandrosov.tkinter.toolchain.Strings;
 
 import java.util.List;
 import java.util.Map;
 
 public class UserGetAmountRoute implements OnRouteListener {
+
+    private final EntityService entityService;
+
+    public UserGetAmountRoute(EntityService entityService) {
+        this.entityService = entityService;
+    }
 
     @Override
     public void listen(Request request, Response response, Map<String, String> routeQuery) throws Exception {
@@ -22,16 +30,8 @@ public class UserGetAmountRoute implements OnRouteListener {
             return;
         }
 
-        List<UserEntity> users = EntityFactory.getAmount(limit, offset, UserEntity.class);
-        StringBuilder jsonUsers = new StringBuilder();
-
-        for(UserEntity user : users) {
-            if(jsonUsers.length() > 0) {
-                jsonUsers.append(",");
-            }
-            jsonUsers.append(user.toString());
-        }
-
+        List<Entity> users = entityService.fetch(UserEntity.class, offset, limit);
+        String jsonUsers = Strings.arrayToStringSequence(users.toArray(), ",", "");
         response.sendJson("{\"users\":[" + jsonUsers + "]}", 200);
     }
 
