@@ -1,8 +1,10 @@
 package com.github.aandrosov.tkinter.toolchain;
 
+import javax.xml.ws.spi.http.HttpExchange;
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class Files {
@@ -31,5 +33,23 @@ public class Files {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean compareHeader(InputStream inputStream, byte[] header) throws IOException {
+        byte[] bytes = new byte[header.length];
+
+        if(inputStream.read(bytes) == -1) {
+            return false;
+        }
+
+        return Arrays.equals(bytes, header);
+    }
+
+    public static boolean isPng(InputStream inputStream) throws IOException {
+        return compareHeader(inputStream, new byte[]{(byte)137, 80, 78, 71, 13, 10, 26, 10});
+    }
+
+    public static boolean isJpeg(InputStream inputStream) throws IOException {
+        return compareHeader(inputStream, new byte[]{(byte)255, (byte)216, (byte)255});
     }
 }
