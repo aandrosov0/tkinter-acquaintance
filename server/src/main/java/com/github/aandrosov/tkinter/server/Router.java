@@ -22,6 +22,7 @@ public class Router implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String requestMethod = exchange.getRequestMethod();
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 
         switch(requestMethod) {
             case "GET":

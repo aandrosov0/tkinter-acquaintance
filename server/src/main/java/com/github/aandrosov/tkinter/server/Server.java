@@ -52,6 +52,7 @@ public class Server {
         return new OnRouteListener[]{
                 new UserGetRoute(entityService),
                 new UserGetAmountRoute(entityService),
+                new MeMessagesGetRoute(entityService),
                 new MeGetPhotoRoute(),
         };
     }
@@ -61,7 +62,6 @@ public class Server {
                 new LoginRoute(entityService),
                 new RegisterRoute(entityService),
                 new MeMessageSendRoute(entityService),
-                new MeMessagesGetRoute(entityService),
         };
     }
 

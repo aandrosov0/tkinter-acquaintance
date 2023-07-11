@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+    id 'application'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+application {
+    mainClass = 'com.github.aandrosov.tkinter.library.TkinterClient'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':toolchain')
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
