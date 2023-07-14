@@ -3,6 +3,8 @@ package com.github.aandrosov.tkinter.library;
 import com.github.aandrosov.tkinter.library.enitity.UserEntity;
 import com.github.aandrosov.tkinter.library.exception.TkinterException;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -21,13 +23,14 @@ public class UserRequest {
     }
 
     public UserEntity get(long id) throws IOException, TkinterException {
-        String response = new String(client.GET("/user/get/" + id), StandardCharsets.UTF_8);
+        String response = new String(client.get("/user/get/" + id), StandardCharsets.UTF_8);
         return gson.fromJson(response, UserEntity.class);
     }
 
     public List<UserEntity> getAmount(int limit, int offset) throws IOException, TkinterException {
         String route = "/user/get/amount/limit/" + limit + "/offset/" + offset;
-        String response = new String(client.GET(route), StandardCharsets.UTF_8);
-        return gson.fromJson(response, new TypeToken<List<UserEntity>>(){}.getType());
+        String response = new String(client.get(route), StandardCharsets.UTF_8);
+        JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+        return gson.fromJson(json.getAsJsonArray("users"), new TypeToken<List<UserEntity>>(){}.getType());
     }
 }

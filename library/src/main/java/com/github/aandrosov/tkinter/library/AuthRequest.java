@@ -18,7 +18,7 @@ public class AuthRequest {
 
     public String login(String phone, String password) throws IOException, TkinterException {
         String data = "phone=" + phone + "&password=" + password;
-        String response = new String(client.POST("/auth/login", data), StandardCharsets.UTF_8);
+        String response = new String(client.post("/auth/login", data), StandardCharsets.UTF_8);
         return ((JsonObject) JsonParser.parseString(response)).get("token").getAsString();
     }
 
@@ -28,7 +28,7 @@ public class AuthRequest {
                 "&phone=" + user.getPhone() +
                 "&password=" + user.getPassword() +
                 "&cityId=" + user.getCityId();
-        String response = new String(client.POST("/auth/register", data), StandardCharsets.UTF_8);
+        String response = new String(client.post("/auth/register", data), StandardCharsets.UTF_8);
         return ((JsonObject) JsonParser.parseString(response)).get("id").getAsLong();
     }
 }

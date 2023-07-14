@@ -70,6 +70,6 @@ public class MeMessageSendRoute implements OnRouteListener {
 
     @Override
     public String getRoute() {
-        return "/api/me/send/message";
+        return "/api/me/message/send";
     }
 }

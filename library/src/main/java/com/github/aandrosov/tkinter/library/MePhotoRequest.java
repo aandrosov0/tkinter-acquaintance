@@ -8,15 +8,18 @@ public class MePhotoRequest {
 
     private final TkinterClient client;
 
-    public MePhotoRequest(TkinterClient client) {
+    private final String token;
+
+    public MePhotoRequest(TkinterClient client, String token) {
         this.client = client;
+        this.token = token;
     }
 
-    public void uploadPhoto(File photo) throws IOException, TkinterException {
-        client.PUT("/me/upload/photo", photo);
+    public void upload(File photo) throws IOException, TkinterException {
+        client.put("/me/upload/photo", photo, token);
     }
 
-    public byte[] getPhoto() throws IOException, TkinterException {
-        return client.GET("/me/get/photo");
+    public byte[] get() throws IOException, TkinterException {
+        return client.get("/me/get/photo", token);
     }
 }
