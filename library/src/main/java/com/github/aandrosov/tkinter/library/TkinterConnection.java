@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class TkinterConnection {
+public class TkinterConnection implements AutoCloseable {
 
     private final HttpURLConnection connection;
 
@@ -35,11 +35,22 @@ public class TkinterConnection {
         }
     }
 
-    public void write(byte[] data) throws IOException {
+    public void write(byte[] data, String contentType) throws IOException {
+        connection.setRequestProperty("Content-Type", contentType);
         connection.setDoOutput(true);
         try(OutputStream outputStream = connection.getOutputStream()) {
             outputStream.write(data);
         }
+    }
+
+    public byte[] writeAndRead(byte[] data, String contentType) throws IOException, TkinterException {
+        write(data, contentType);
+        return read();
+    }
+
+    @Override
+    public void close() {
+        connection.disconnect();
     }
 
     public void setRequestMethod(String method) throws ProtocolException {
